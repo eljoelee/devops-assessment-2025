@@ -32,7 +32,7 @@
             {
                 "name": "DATABASE_USER",
                 "value": "${rds_user}"
-            },
+            }
         ],
         "mountPoints": [],
         "volumesFrom": [],
@@ -49,7 +49,6 @@
         "readonlyRootFilesystem": true,
         "dnsServers": [],
         "dnsSearchDomains": [],
-        "dockerSecurityOptions": ["no-new-privileges"],
         "pseudoTerminal": false,
         "logConfiguration": {
             "logDriver": "awslogs",

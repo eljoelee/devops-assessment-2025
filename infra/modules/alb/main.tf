@@ -1,20 +1,20 @@
 module "alb" {
   source = "terraform-aws-modules/alb/aws"
 
-  name = "${var.project}-${var.environment}-alb"
-  vpc_id = var.vpc_id
+  name    = "${var.project}-${var.environment}-alb"
+  vpc_id  = var.vpc_id
   subnets = var.public_subnets_ids
 
   idle_timeout = 300
 
   security_group_ingress_rules = {
     all_http = {
-        type = "ingress"
-        from_port = 80
-        to_port = 80
-        protocol = "tcp"
-        description = "Allow HTTP traffic"
-        cidr_ipv4 = "0.0.0.0/0"
+      type        = "ingress"
+      from_port   = 80
+      to_port     = 80
+      protocol    = "tcp"
+      description = "Allow HTTP traffic"
+      cidr_ipv4   = "0.0.0.0/0"
     }
 
     # all_https = {
@@ -29,73 +29,73 @@ module "alb" {
 
   security_group_egress_rules = {
     all_traffic = {
-        ip_protocol = "-1"
-        description = "Allow all traffic"
-        cidr_ipv4 = "0.0.0.0/0"
+      ip_protocol = "-1"
+      description = "Allow all traffic"
+      cidr_ipv4   = "0.0.0.0/0"
     }
   }
 
   security_group_tags = {
-    Name = "${var.project}-${var.environment}-alb-sg"
-    Project = var.project
+    Name        = "${var.project}-${var.environment}-alb-sg"
+    Project     = var.project
     Environment = var.environment
   }
 
   listeners = {
     http_listener = {
-        port = 80
-        protocol = "HTTP"
+      port     = 80
+      protocol = "HTTP"
 
-        forward = {
-            target_group_key = "alb-target-group"
-        }
+      forward = {
+        target_group_key = "alb-target-group"
+      }
     }
 
-  # redirect_http_to_https = {
-  #     port = 80
-  #     protocol = "HTTP"
+    # redirect_http_to_https = {
+    #     port = 80
+    #     protocol = "HTTP"
 
-  #     redirect = {
-  #         port = 443
-  #         protocol = "HTTPS"
-  #         status_code = "HTTP_301"
-  #     }
-  # }
+    #     redirect = {
+    #         port = 443
+    #         protocol = "HTTPS"
+    #         status_code = "HTTP_301"
+    #     }
+    # }
 
-  #   https_listener = {
-  #       port = 443
-  #       protocol = "HTTPS"
-  #       certificate_arn = var.certificate_arn
+    #   https_listener = {
+    #       port = 443
+    #       protocol = "HTTPS"
+    #       certificate_arn = var.certificate_arn
 
-  #       forward = {
-  #           target_group_key = "alb-target-group"
-  #       }
-  #   }
+    #       forward = {
+    #           target_group_key = "alb-target-group"
+    #       }
+    #   }
   }
 
   target_groups = {
     alb-target-group = {
-        name = "${var.project}-${var.environment}-alb-tg"
-        port = 8000
-        protocol = "HTTP"
-        target_type = "ip"
-        
-        health_check = {
-            path = "/health"
-            interval = 30
-            timeout = 10
-            healthy_threshold = 2
-            unhealthy_threshold = 2
-            matcher = "200-302"
-        }
+      name        = "${var.project}-${var.environment}-alb-tg"
+      port        = 8000
+      protocol    = "HTTP"
+      target_type = "ip"
 
-        create_attachment = false
+      health_check = {
+        path                = "/health"
+        interval            = 30
+        timeout             = 10
+        healthy_threshold   = 2
+        unhealthy_threshold = 2
+        matcher             = "200-302"
+      }
+
+      create_attachment = false
     }
   }
 
   tags = {
-    Name = "${var.project}-${var.environment}-alb"
-    Project = var.project
+    Name        = "${var.project}-${var.environment}-alb"
+    Project     = var.project
     Environment = var.environment
   }
 }

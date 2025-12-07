@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from datetime import datetime
 import os
 import asyncpg
+from urllib.parse import quote_plus
 from contextlib import asynccontextmanager
 
 # 데이터베이스 연결 풀 (전역 변수)
@@ -10,20 +11,19 @@ db_pool = None
 
 
 def get_database_url() -> str:
-    env = os.getenv("ENV", "dev").lower()
+    env = os.getenv("ENV", "dev")
 
     if env == "test":
-        db_user = os.getenv("POSTGRES_USER", "test_user")
-        db_password = os.getenv("POSTGRES_PASSWORD", "test_password")
-        db_host = os.getenv("POSTGRES_HOST", "localhost")
-        db_port = os.getenv("POSTGRES_PORT", "5432")
-        db_name = os.getenv("POSTGRES_DB", "test_db")
-        return f"postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
+        DATABASE_URL = "postgresql://test_user:test_password@localhost:5432/test_db"
     else:
-        return os.getenv(
-            "DATABASE_URL",
-            "postgresql://receipts_user:receipts_password@db:5432/receipts_db",
-        )
+        DATABASE_HOST = os.getenv("DATABASE_HOST")
+        DATABASE_PORT = os.getenv("DATABASE_PORT")
+        DATABASE_USER = os.getenv("DATABASE_USER")
+        DATABASE_PASSWORD = os.getenv("DATABASE_PASSWORD")
+
+        DATABASE_URL = f"postgresql://{DATABASE_USER}:{DATABASE_PASSWORD}@{DATABASE_HOST}:{DATABASE_PORT}/receipts_db"
+
+    return DATABASE_URL
 
 
 @asynccontextmanager

@@ -13,17 +13,12 @@ variable "region" {
   type        = string
 }
 
-variable "vpc_id" {
-  description = "VPC ID"
+variable "account_id" {
+  description = "AWS account ID"
   type        = string
 }
 
-variable "database_subnets_ids" {
-  description = "Database subnets ids"
-  type        = list(string)
-}
-
-variable "ecs_sg_id" {
-  description = "ECS security group ID"
+variable "secretsmanager_arn" {
+  description = "Secretsmanager ARN"
   type        = string
 }

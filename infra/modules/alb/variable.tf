@@ -1,21 +1,21 @@
 variable "project" {
-    description = "Project name"
-    type = string
+  description = "Project name"
+  type        = string
 }
 
 variable "environment" {
-    description = "Environment name"
-    type = string
+  description = "Environment name"
+  type        = string
 }
 
 variable "vpc_id" {
-    description = "VPC ID"
-    type = string
+  description = "VPC ID"
+  type        = string
 }
 
 variable "public_subnets_ids" {
-    description = "Public subnets ids"
-    type = list(string)
+  description = "Public subnets ids"
+  type        = list(string)
 }
 
 # variable "certificate_arn" {
