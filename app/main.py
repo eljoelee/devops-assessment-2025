@@ -3,7 +3,6 @@ from pydantic import BaseModel
 from datetime import datetime
 import os
 import asyncpg
-from urllib.parse import quote_plus
 from contextlib import asynccontextmanager
 
 # 데이터베이스 연결 풀 (전역 변수)
