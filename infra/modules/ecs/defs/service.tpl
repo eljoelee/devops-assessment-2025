@@ -62,12 +62,12 @@
         "healthCheck": {
             "command": [
                 "CMD-SHELL",
-                "curl -s -f http://localhost:8000/health || exit 1"
+                "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/health').close()\" || exit 1"
             ],
             "interval": 30,
-            "timeout": 3,
             "retries": 3,
-            "startPeriod": 10
+            "startPeriod": 10,
+            "timeout": 3
         }
     }
 ]
