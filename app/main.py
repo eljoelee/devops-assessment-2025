@@ -23,7 +23,7 @@ def get_database_url() -> str:
 
         ENCODED_PASSWORD = quote_plus(DATABASE_PASSWORD) if DATABASE_PASSWORD else ""
 
-        DATABASE_URL = f"postgresql://{DATABASE_USER}:{DATABASE_PASSWORD}@{DATABASE_HOST}:{DATABASE_PORT}/receipts_db"
+        DATABASE_URL = f"postgresql://{DATABASE_USER}:{ENCODED_PASSWORD}@{DATABASE_HOST}:{DATABASE_PORT}/receipts_db"
 
     return DATABASE_URL
 
