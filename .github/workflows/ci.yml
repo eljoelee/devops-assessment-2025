@@ -22,7 +22,7 @@ jobs:
         working-directory: ./app
         run: |
           uv python install 3.11
-          
+
       - name: Install dependencies
         working-directory: ./app
         run: |
