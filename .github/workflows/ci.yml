@@ -31,12 +31,12 @@ jobs:
       - name: Run ruff check (Linter)
         working-directory: ./app
         run: |
-          uv ruff check main.py
+          uv run ruff check main.py
 
       - name: Run ruff format (Formatter)
         working-directory: ./app
         run: |
-          uv ruff format --check main.py
+          uv run ruff format --check main.py
 
   test:
     name: Run Application & Health Check
