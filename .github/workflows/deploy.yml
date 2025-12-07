@@ -1,0 +1,51 @@
+name: Deploy
+
+on:
+  repository_dispatch:
+    types: [deploy]
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ap-northeast-2
+          role-to-assume: arn:aws:iam::131421611146:role/github_ecs_deploy_role
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Get task-def
+        run: |
+          aws ecs describe-task-definition \
+            --task-definition devops-assessment-dev-task \
+            --output json | jq '.taskDefinition |
+            del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy)' \
+            > task-definitions.json
+
+      - name: Fill in the new image ID in the ECS task-def
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1.7.2
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          TAG: ${{ github.event.client_payload.tag }}
+        with:
+          task-definition: task-definitions.json
+          container-name: receipt-api
+          image: ${{ env.REGISTRY }}/devops-assessment-dev-ecr:${{ env.TAG }}
+
+      - name: Deploy Amazon ECS service
+        if: steps.task-def.outcome == 'success'
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2.3.2
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: devops-assessment-dev-service
+          cluster: devops-assessment-dev-cluster
