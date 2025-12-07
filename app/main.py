@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from datetime import datetime
 import os
 import asyncpg
+from urllib.parse import quote_plus
 from contextlib import asynccontextmanager
 
 # 데이터베이스 연결 풀 (전역 변수)
@@ -19,6 +20,8 @@ def get_database_url() -> str:
         DATABASE_PORT = os.getenv("DATABASE_PORT")
         DATABASE_USER = os.getenv("DATABASE_USER")
         DATABASE_PASSWORD = os.getenv("DATABASE_PASSWORD")
+
+        ENCODED_PASSWORD = quote_plus(DATABASE_PASSWORD) if DATABASE_PASSWORD else ""
 
         DATABASE_URL = f"postgresql://{DATABASE_USER}:{DATABASE_PASSWORD}@{DATABASE_HOST}:{DATABASE_PORT}/receipts_db"
 
