@@ -1,0 +1,64 @@
+name: Build to Stage
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  id-token: write
+  contents: write
+  actions: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set variables
+        id: set-variables
+        run: |
+          git_short_hash=$(git rev-parse --short "$GITHUB_SHA")
+          echo "GITHUB_SHA: $GITHUB_SHA"
+          echo "Git short hash: $git_short_hash"
+          echo "git_short_hash=$git_short_hash" >> $GITHUB_OUTPUT
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ap-northeast-2
+          role-to-assume: arn:aws:iam::123456789012:role/github_ecs_deploy_role
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and Push image to Amazon ECR
+        id: build
+        uses: docker/build-push-action@v6
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          TAG: ${{ steps.set-variables.outputs.git_short_hash }}
+        with:
+          push: true
+          context: .
+          tags: |
+            ${{ env.REGISTRY }}/receipts-api:${{ env.TAG }}
+            ${{ env.REGISTRY }}/receipts-api:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Trigger to Deploy Receipts API
+        if: steps.build.outcome == 'success'
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          event-type: deploy
+          client-payload: '{"tag": "${{ steps.set-variables.outputs.git_short_hash }}"}'
