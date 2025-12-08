@@ -28,11 +28,6 @@ variable "alb_sg_id" {
   type        = string
 }
 
-variable "vpc_cidr_block" {
-  description = "VPC CIDR block"
-  type        = string
-}
-
 variable "private_subnets" {
   description = "Private subnets"
   type        = list(string)

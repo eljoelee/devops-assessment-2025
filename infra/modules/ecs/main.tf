@@ -23,7 +23,6 @@ module "ecs_security_group" {
   ]
 
   tags = {
-    Name        = "${var.project}-${var.environment}-ecs-sg"
     Project     = var.project
     Environment = var.environment
   }
@@ -38,7 +37,6 @@ resource "aws_ecs_cluster" "cluster" {
   }
 
   tags = {
-    Name        = "${var.project}-${var.environment}-cluster"
     Project     = var.project
     Environment = var.environment
   }
@@ -64,7 +62,6 @@ resource "aws_ecs_service" "service" {
   }
 
   tags = {
-    Name        = "${var.project}-${var.environment}-service"
     Project     = var.project
     Environment = var.environment
   }
@@ -82,6 +79,7 @@ resource "aws_appautoscaling_target" "autoscaling_target" {
   depends_on = [aws_ecs_service.service]
 }
 
+# CPU 사용량이 60%를 초과하면 컨테이너 수 증가
 resource "aws_appautoscaling_policy" "autoscaling_policy" {
   name               = "${var.project}-${var.environment}-autoscaling-policy"
   policy_type        = "TargetTrackingScaling"
@@ -90,7 +88,7 @@ resource "aws_appautoscaling_policy" "autoscaling_policy" {
   service_namespace  = "ecs"
 
   target_tracking_scaling_policy_configuration {
-    target_value = 50
+    target_value = 60
 
     predefined_metric_specification {
       predefined_metric_type = "ECSServiceAverageCPUUtilization"
@@ -102,13 +100,14 @@ resource "aws_appautoscaling_policy" "autoscaling_policy" {
   depends_on = [aws_appautoscaling_target.autoscaling_target]
 }
 
+# 매월 말일 3일 전에 컨테이너 수 증가
 resource "aws_appautoscaling_scheduled_action" "end_of_month_scheduled_action" {
   name               = "${var.project}-${var.environment}-3days-before-end-of-month"
   service_namespace  = "ecs"
   resource_id        = "service/${aws_ecs_cluster.cluster.name}/${aws_ecs_service.service.name}"
   scalable_dimension = "ecs:service:DesiredCount"
 
-  schedule = "cron(0 0 L-2 * ? *)"
+  schedule = "cron(0 0 L-3 * ? *)"
 
   scalable_target_action {
     min_capacity = 9
@@ -118,6 +117,7 @@ resource "aws_appautoscaling_scheduled_action" "end_of_month_scheduled_action" {
   depends_on = [aws_appautoscaling_target.autoscaling_target]
 }
 
+# 매월 1일에 컨테이너 수 초기화
 resource "aws_appautoscaling_scheduled_action" "month_start_scheduled_action" {
   name               = "${var.project}-${var.environment}-month-start"
   service_namespace  = "ecs"
@@ -149,6 +149,8 @@ resource "aws_ecs_task_definition" "task" {
     rds_address        = var.rds_address
     rds_port           = var.rds_port
     rds_user           = var.rds_user
+    
+    # 작업 정의 내 Secrets를 통해 데이터베이스 비밀번호를 가져옴
     secretsmanager_arn = var.secretsmanager_arn
   })
 
@@ -168,7 +170,6 @@ resource "aws_ecs_task_definition" "task" {
   }
 
   tags = {
-    Name        = "${var.project}-${var.environment}-task"
     Project     = var.project
     Environment = var.environment
   }

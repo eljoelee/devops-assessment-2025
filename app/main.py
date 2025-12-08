@@ -13,6 +13,7 @@ db_pool = None
 def get_database_url() -> str:
     env = os.getenv("ENV", "dev")
 
+    # 테스트 환경(Docker-compose, CI)에서는 더미 데이터베이스 사용
     if env == "test":
         DATABASE_URL = "postgresql://test_user:test_password@localhost:5432/test_db"
     else:
@@ -21,6 +22,7 @@ def get_database_url() -> str:
         DATABASE_USER = os.getenv("DATABASE_USER")
         DATABASE_PASSWORD = os.getenv("DATABASE_PASSWORD")
 
+        # 시크릿 매니저에서 DB 비밀번호를 가져올 때 특수문자 처리
         ENCODED_PASSWORD = quote_plus(DATABASE_PASSWORD) if DATABASE_PASSWORD else ""
 
         DATABASE_URL = f"postgresql://{DATABASE_USER}:{ENCODED_PASSWORD}@{DATABASE_HOST}:{DATABASE_PORT}/receipts_db"

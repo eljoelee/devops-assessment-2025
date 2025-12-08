@@ -5,8 +5,6 @@ module "alb" {
   vpc_id  = var.vpc_id
   subnets = var.public_subnets_ids
 
-  idle_timeout = 300
-
   security_group_ingress_rules = {
     all_http = {
       type        = "ingress"
@@ -36,7 +34,6 @@ module "alb" {
   }
 
   security_group_tags = {
-    Name        = "${var.project}-${var.environment}-alb-sg"
     Project     = var.project
     Environment = var.environment
   }
@@ -51,6 +48,7 @@ module "alb" {
       }
     }
 
+    # 도메인, acm 등 추가 리소스 필요하여 주석 처리함
     # redirect_http_to_https = {
     #     port = 80
     #     protocol = "HTTP"
@@ -94,7 +92,6 @@ module "alb" {
   }
 
   tags = {
-    Name        = "${var.project}-${var.environment}-alb"
     Project     = var.project
     Environment = var.environment
   }

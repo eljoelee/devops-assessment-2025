@@ -27,12 +27,14 @@ jobs:
         working-directory: ./app
         run: |
           uv sync --dev
-
+      
+      # 파이썬 린트(import, 잠재적 버그 등)
       - name: Run ruff check (Linter)
         working-directory: ./app
         run: |
           uv run ruff check main.py
 
+      # 파이썬 코드 포맷팅(줄바꿈, 들여쓰기, 공백 등)
       - name: Run ruff format (Formatter)
         working-directory: ./app
         run: |

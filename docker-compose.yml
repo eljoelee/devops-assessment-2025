@@ -10,6 +10,7 @@ services:
     ports:
       - "8000:8000"
     environment:
+      - ENV=test
       - PORT=8000
       - DATABASE_URL=postgresql://receipts_user:receipts_password@db:5432/receipts_db
       - LOG_LEVEL=INFO

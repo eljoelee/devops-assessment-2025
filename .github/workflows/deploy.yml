@@ -22,11 +22,12 @@ jobs:
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
-
+      
+      # 작업 정의서 가져오기
       - name: Get task-def
         run: |
           aws ecs describe-task-definition \
-            --task-definition devops-assessment-dev-task \
+            --task-definition spendit-receipt-api-dev-task \
             --output json | jq '.taskDefinition |
             del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy)' \
             > task-definitions.json
@@ -47,5 +48,5 @@ jobs:
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2.3.2
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
-          service: devops-assessment-dev-service
-          cluster: devops-assessment-dev-cluster
+          service: spendit-receipt-api-dev-service
+          cluster: spendit-receipt-api-dev-cluster

@@ -23,7 +23,6 @@ module "rds_security_group" {
   ]
 
   tags = {
-    Name        = "${var.project}-${var.environment}-rds-sg"
     Project     = var.project
     Environment = var.environment
   }
@@ -72,7 +71,6 @@ module "rds" {
   backup_window      = "17:00-18:00"
 
   tags = {
-    Name        = "${var.project}-${var.environment}-rds"
     Project     = "${var.project}"
     Environment = "${var.environment}"
   }

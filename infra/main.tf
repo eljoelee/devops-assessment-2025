@@ -1,35 +1,34 @@
 module "vpc" {
   source = "./modules/vpc"
 
-  project     = local.project
-  environment = local.environment
-  region      = local.region
+  project     = local.projects.name
+  environment = local.projects.environment
 
-  vpc_cidr = "10.0.0.0/16"
+  vpc_cidr = local.vpc.cidr
+  azs      = local.vpc.azs
+  
+  private_subnets      = local.vpc.private_subnets
+  private_subnet_names = local.vpc.private_subnet_names
 
-  private_subnets      = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
-  private_subnet_names = ["private-subnet-1", "private-subnet-2", "private-subnet-3"]
+  database_subnets      = local.vpc.database_subnets
+  database_subnet_names = local.vpc.database_subnet_names
 
-  database_subnets      = ["10.0.4.0/24", "10.0.5.0/24", "10.0.6.0/24"]
-  database_subnet_names = ["database-subnet-1", "database-subnet-2", "database-subnet-3"]
-
-  public_subnets      = ["10.0.7.0/24", "10.0.8.0/24", "10.0.9.0/24"]
-  public_subnet_names = ["public-subnet-1", "public-subnet-2", "public-subnet-3"]
+  public_subnets      = local.vpc.public_subnets
+  public_subnet_names = local.vpc.public_subnet_names
 }
 
 module "ecr" {
   source = "./modules/ecr"
 
-  project     = local.project
-  environment = local.environment
+  project     = local.projects.name
+  environment = local.projects.environment
 }
 
 module "rds" {
   source = "./modules/rds"
 
-  project     = local.project
-  environment = local.environment
-  region      = local.region
+  project     = local.projects.name
+  environment = local.projects.environment
 
   vpc_id               = module.vpc.vpc_id
   database_subnets_ids = module.vpc.database_subnets
@@ -40,10 +39,11 @@ module "rds" {
 module "iam" {
   source = "./modules/iam"
 
-  project     = local.project
-  environment = local.environment
-  region      = local.region
-  account_id  = local.account_id
+  project     = local.projects.name
+  environment = local.projects.environment
+  account_id  = local.projects.account_id
+
+  region      = data.aws_region.current.id
 
   secretsmanager_arn = module.rds.rds_master_secret_arn
 }
@@ -51,8 +51,8 @@ module "iam" {
 module "alb" {
   source = "./modules/alb"
 
-  project     = local.project
-  environment = local.environment
+  project     = local.projects.name
+  environment = local.projects.environment
 
   vpc_id             = module.vpc.vpc_id
   public_subnets_ids = module.vpc.public_subnets
@@ -61,13 +61,13 @@ module "alb" {
 module "ecs" {
   source = "./modules/ecs"
 
-  project = local.project
-  environment = local.environment
-  region = local.region
-  account_id = local.account_id
+  project = local.projects.name
+  environment = local.projects.environment
+  account_id = local.projects.account_id
+  
+  region = data.aws_region.current.id
 
   vpc_id = module.vpc.vpc_id
-  vpc_cidr_block = module.vpc.vpc_cidr_block
   private_subnets = module.vpc.private_subnets
 
   alb_sg_id = module.alb.alb_sg_id

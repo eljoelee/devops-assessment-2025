@@ -1,7 +1,8 @@
+# 컨테이너 내부의 어플리케이션에서 AWS 서비스에 접근할 때 사용하는 역할
 module "ecs_task_role" {
   source = "terraform-aws-modules/iam/aws//modules/iam-role"
 
-  name = "${var.project}-${var.environment}-task-role"
+  name = "ecs-task-role"
 
   trust_policy_permissions = {
     TrustRoleAndServiceToAssume = {
@@ -58,12 +59,18 @@ module "ecs_task_execution_policy" {
       ]
     }
     EOF
+
+    tags = {
+      Project     = var.project
+      Environment = var.environment
+    }
 }
 
+# 컨테이너를 실행할 때 사용하는 역할
 module "ecs_task_execution_role" {
   source = "terraform-aws-modules/iam/aws//modules/iam-role"
 
-  name = "${var.project}-${var.environment}-execution-role"
+  name = "ecs-task-execution-role"
 
   policies = {
     AmazonECSTaskExecutionRolePolicy = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"

@@ -4,7 +4,7 @@ module "vpc" {
   name = "${var.project}-${var.environment}-vpc"
   cidr = var.vpc_cidr
 
-  azs = ["ap-northeast-2a", "ap-northeast-2b", "ap-northeast-2c"]
+  azs = var.azs
 
   private_subnets      = var.private_subnets
   private_subnet_names = var.private_subnet_names
