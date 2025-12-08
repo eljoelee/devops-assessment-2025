@@ -133,18 +133,18 @@ infra/
 ### 월 비용 30% 초과
 
 - **도구 활용**
-  1. **AWS Cost Explorer**
-    - 비용 그래프에서 특정 날짜 또는 특정 서비스 급증 확인
-    - RI 또는 SP 적용률이 떨어졌는지 확인
+1. **AWS Cost Explorer**
+  - 비용 그래프에서 특정 날짜 또는 특정 서비스 급증 확인
+  - RI 또는 SP 적용률이 떨어졌는지 확인
 
-  2. **AWS Compute Optimizer**
-    - EC2 인스턴스 유형 과다 프로비저닝 체크
-    - EBS gp2 타입 체크
-    - Lambda 메모리 체크
-    - ECS on Fargate CPU, 메모리 과다 프로비저닝 체크
+2. **AWS Compute Optimizer**
+  - EC2 인스턴스 유형 과다 프로비저닝 체크
+  - EBS gp2 타입 체크
+  - Lambda 메모리 체크
+  - ECS on Fargate CPU, 메모리 과다 프로비저닝 체크
 
-  3. **CloudWatch**
-    - 유휴 리소스 요청/응답 확인
+3. **CloudWatch**
+  - 유휴 리소스 요청/응답 확인
 
 - **개선안**
   1. AWS Config 활용하여 일부 리소스 생성 감지 알람 구성 
